@@ -1,4 +1,4 @@
-# 视觉组二轮考核 (2026)
+# 视觉组二轮考核自瞄部分
 
 ## 任务背景
 在今年的视觉算法架构中，我们抛弃了传统视觉以及 ROS2 架构，采取了 **纯 C++ 框架 + 神经网络识别** 的体系以求性能上的极限以及观测的稳定。
@@ -9,7 +9,7 @@
 4. （进阶）设计解算逻辑预测目标弹道
 
 ## 环境要求
-- Ubuntu 环境 / 纯 C++ 编译环境
+- Ubuntu 环境（推荐双系统）
 1. 安装依赖项：
    - [OpenVINO](https://docs.openvino.ai/2026/get-started/install-openvino.html?PACKAGE=OPENVINO_BASE&VERSION=v_2026_1_0&OP_SYSTEM=LINUX&DISTRIBUTION=APT)
    - 其余：
@@ -18,7 +18,6 @@
         git \
         g++ \
         cmake \
-        can-utils \
         libopencv-dev \
         libfmt-dev \
         libeigen3-dev \
