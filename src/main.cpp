@@ -12,7 +12,7 @@ int main(int argc, char** argv) {
   // 1. 初始化模型与求解器
   string model_path = "assets/0526.onnx";   // 或是0526.xml
   string config_path = "configs/infantry.yaml";
-  string video_path = "assets/infantry.avi";
+  string video_path = "assets/infantry2.avi";
 
   // TODO: 初始化 YOLOv5 类
   YOLOV5 yolov5(config_path, true);
@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
 
     Armor * target = nullptr;
     double min_distance = 1e9;
-    
+
     // 3. 将装甲板画出来并求解 PnP
     for (auto & armor : armors) {
       // TODO: 使用 solver.solve(armor) 进行位姿解算得到相对距离
