@@ -15,7 +15,7 @@ Solver::Solver(const std::string & config_path)
   camera_matrix_ = cv::Mat(3, 3, CV_64F, camera_matrix.data()).clone();
   distort_coeffs_ = cv::Mat(1, static_cast<int>(distort_coeffs.size()), CV_64F, distort_coeffs.data()).clone();
 }
-}
+
 
 void Solver::solve(Armor & armor) const
 {
@@ -62,5 +62,7 @@ void Solver::solve(Armor & armor) const
     tvec.at<double>(1),
     tvec.at<double>(2)
   );
+
+}
 
 }  // namespace auto_aim

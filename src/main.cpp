@@ -25,10 +25,10 @@ int main(int argc, char** argv) {
   }
 
   cv::Mat frame;
+  int frame_count = 0;
   while (cap.read(frame)) {
     // 2. 调用模型识别
-    std::vector<Armor> armors;
-    // TODO: 使用 yolov5 提取 armors
+        // TODO: 使用 yolov5 提取 armors
     ++frame_count;
     cv::Mat show_img;
     auto armors = yolov5.detect(frame, frame_count, show_img);

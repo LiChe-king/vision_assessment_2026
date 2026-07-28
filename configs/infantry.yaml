@@ -27,3 +27,5 @@ distort_coeffs: [-0.053032056252978271, 0.12304744809762919, -0.0008330652510950
 # 相机同理想情况的偏角: yaw0.56 pitch1.05 roll0.41 degree
 R_camera2gimbal: [0, 0, 1, -1, 0, 0, 0, -1, 0]
 t_camera2gimbal: [0.16, 0.047, 0]
+
+threshold: 128
