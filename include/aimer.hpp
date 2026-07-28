@@ -30,10 +30,6 @@ public:
   AimResult update(const Armor & armor, double timestamp);
   void drawReprojection(cv::Mat & image, const AimResult & result) const;
 
-  std::vector<cv::Point2f> predictArmorPoints2D(
-  const Armor & armor,
-  const AimResult & result) const;
-
 private:
   static constexpr double kPredictTime = 0.5;
   static constexpr double kVehicleRadius = 0.28;
