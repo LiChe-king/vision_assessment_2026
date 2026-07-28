@@ -151,6 +151,8 @@ Eigen::Matrix<double, 4, 1> Aimer::makeMeasurement(const Armor & armor) const
   Eigen::Matrix<double, 4, 1> measurement;
 
   const double yaw = normalizeAngle(armor.ypr_in_gimbal.x());
+  Eigen::Vector3d normal(std::sin(yaw), 0.0, std::cos(yaw));
+  Eigen::Vector3d vehicle_center = armor.xyz_in_gimbal - normal * kVehicleRadius;
 
   measurement.head<3>() = armorToVehicleCenter(armor.xyz_in_gimbal, yaw);
   measurement(3) = yaw;
@@ -195,32 +197,31 @@ std::vector<cv::Point3f> Aimer::makeArmorCorners(
   int index,
   bool big) const
 {
-  const double yaw = vehicle_yaw + index * CV_PI / 2.0;
+  const double yaw = normalizeAngle(vehicle_yaw + index * CV_PI / 2.0);
   const double width = big ? kBigArmorWidth : kSmallArmorWidth;
 
-  const Eigen::Vector3d normal(std::sin(yaw), 0.0, std::cos(yaw));
-  const Eigen::Vector3d right(std::cos(yaw), 0.0, -std::sin(yaw));
-  const Eigen::Vector3d center = vehicle_center + normal * kVehicleRadius;
+  Eigen::Vector3d normal(std::sin(yaw), 0.0, std::cos(yaw));
+  Eigen::Vector3d right(std::cos(yaw), 0.0, -std::sin(yaw));
+  Eigen::Vector3d up(0.0, -1.0, 0.0);
+
+  Eigen::Vector3d center = vehicle_center + normal * kVehicleRadius;
 
   std::vector<Eigen::Vector3d> corners = {
-    center - right * (width / 2.0) - Eigen::Vector3d(0.0, kArmorHeight / 2.0, 0.0),
-    center + right * (width / 2.0) - Eigen::Vector3d(0.0, kArmorHeight / 2.0, 0.0),
-    center + right * (width / 2.0) + Eigen::Vector3d(0.0, kArmorHeight / 2.0, 0.0),
-    center - right * (width / 2.0) + Eigen::Vector3d(0.0, kArmorHeight / 2.0, 0.0),
+    center - right * (width / 2.0) + up * (kArmorHeight / 2.0),
+    center + right * (width / 2.0) + up * (kArmorHeight / 2.0),
+    center + right * (width / 2.0) - up * (kArmorHeight / 2.0),
+    center - right * (width / 2.0) - up * (kArmorHeight / 2.0),
   };
 
   std::vector<cv::Point3f> cv_corners;
-  cv_corners.reserve(corners.size());
-
-  for (const auto & point : corners) {
+  for (const auto & p : corners) {
     cv_corners.emplace_back(
-      static_cast<float>(point.x()),
-      static_cast<float>(point.y()),
-      static_cast<float>(point.z())
+      static_cast<float>(p.x()),
+      static_cast<float>(p.y()),
+      static_cast<float>(p.z())
     );
   }
 
   return cv_corners;
 }
-
 }  // namespace auto_aim
