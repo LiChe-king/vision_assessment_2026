@@ -19,7 +19,7 @@ int main(int argc, char** argv) {
   // TODO: 初始化 Solver 类
   Solver solver(config_path);
 
-  Aimer aimer;
+  Aimer aimer(config_path);
 
   cv::VideoCapture cap(video_path);
   if (!cap.isOpened()) {
@@ -39,6 +39,10 @@ int main(int argc, char** argv) {
     if (show_img.empty()) {
       show_img = frame.clone();
     }
+
+    Armor * target = nullptr;
+    double min_distance = 1e9;
+    
     // 3. 将装甲板画出来并求解 PnP
     for (auto & armor : armors) {
       // TODO: 使用 solver.solve(armor) 进行位姿解算得到相对距离
@@ -55,19 +59,28 @@ int main(int argc, char** argv) {
         2
       );
 
-      auto aim = aimer.update(armor, timestamp);
-      cv::putText(
-        show_img,
-        "pred0.5s yaw: " + std::to_string(aim.yaw * 180.0 / CV_PI) +
-          " pitch: " + std::to_string(aim.pitch * 180.0 / CV_PI),
-        armor.center + cv::Point2f(0, 55),
-        cv::FONT_HERSHEY_SIMPLEX,
-        0.6,
-        cv::Scalar(255, 0, 0),
-        2
-      );
-      
+       if (distance < min_distance) {
+         min_distance = distance;
+         target = &armor;
+       }
     }
+
+     if (target != nullptr) {
+       auto aim = aimer.update(*target, timestamp);
+       aimer.drawReprojection(show_img, aim);
+
+       cv::putText(
+         show_img,
+         "pred0.5s yaw: " + std::to_string(aim.yaw * 180.0 / CV_PI) +
+           " pitch: " + std::to_string(aim.pitch * 180.0 / CV_PI),
+         target->center + cv::Point2f(0, 55),
+         cv::FONT_HERSHEY_SIMPLEX,
+         0.6,
+         cv::Scalar(255, 0, 0),
+         2
+        );
+     }
+      
 
     cv::imshow("Vision Assessment", show_img);
     if (cv::waitKey(1) == 27) { // ESC 退出

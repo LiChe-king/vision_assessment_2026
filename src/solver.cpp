@@ -1,5 +1,6 @@
 #include "solver.hpp"
 #include <yaml-cpp/yaml.h>
+#include <cmath>
 
 namespace auto_aim
 {
@@ -61,6 +62,18 @@ void Solver::solve(Armor & armor) const
     tvec.at<double>(0),
     tvec.at<double>(1),
     tvec.at<double>(2)
+  );
+
+  cv::Mat rotation;
+  cv::Rodrigues(rvec, rotation);
+
+  armor.ypr_in_gimbal = Eigen::Vector3d(
+    std::atan2(rotation.at<double>(0, 2), rotation.at<double>(2, 2)),
+    std::atan2(
+      -rotation.at<double>(1, 2),
+      std::hypot(rotation.at<double>(0, 2), rotation.at<double>(2, 2))
+    ),
+    std::atan2(rotation.at<double>(1, 0), rotation.at<double>(1, 1))
   );
 
 }
