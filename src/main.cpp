@@ -3,6 +3,7 @@
 
 #include "yolov5.hpp"
 #include "solver.hpp"
+#include "aimer.hpp"
 
 using namespace auto_aim;
 using namespace std;
@@ -18,6 +19,8 @@ int main(int argc, char** argv) {
   // TODO: 初始化 Solver 类
   Solver solver(config_path);
 
+  Aimer aimer;
+
   cv::VideoCapture cap(video_path);
   if (!cap.isOpened()) {
     cerr << "Failed to open video: " << video_path << endl;
@@ -30,6 +33,7 @@ int main(int argc, char** argv) {
     // 2. 调用模型识别
         // TODO: 使用 yolov5 提取 armors
     ++frame_count;
+    double timestamp = cap.get(cv::CAP_PROP_POS_MSEC) / 1000.0;
     cv::Mat show_img;
     auto armors = yolov5.detect(frame, frame_count, show_img);
     if (show_img.empty()) {
@@ -50,6 +54,19 @@ int main(int argc, char** argv) {
         cv::Scalar(0, 0, 255),
         2
       );
+
+      auto aim = aimer.update(armor, timestamp);
+      cv::putText(
+        show_img,
+        "pred0.5s yaw: " + std::to_string(aim.yaw * 180.0 / CV_PI) +
+          " pitch: " + std::to_string(aim.pitch * 180.0 / CV_PI),
+        armor.center + cv::Point2f(0, 55),
+        cv::FONT_HERSHEY_SIMPLEX,
+        0.6,
+        cv::Scalar(255, 0, 0),
+        2
+      );
+      
     }
 
     cv::imshow("Vision Assessment", show_img);
