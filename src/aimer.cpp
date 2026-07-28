@@ -91,6 +91,51 @@ void Aimer::drawReprojection(cv::Mat & image, const AimResult & result) const
   }
 }
 
+std::vector<cv::Point2f> Aimer::predictArmorPoints2D(
+  const Armor & armor,
+  const AimResult & result) const
+{
+  std::vector<cv::Point2f> predicted_center_2d;
+
+  std::vector<cv::Point3f> point_3d = {
+    cv::Point3f(
+      static_cast<float>(result.predicted_position.x()),
+      static_cast<float>(result.predicted_position.y()),
+      static_cast<float>(result.predicted_position.z())
+    )
+  };
+
+  cv::projectPoints(
+    point_3d,
+    cv::Vec3d(0.0, 0.0, 0.0),
+    cv::Vec3d(0.0, 0.0, 0.0),
+    camera_matrix_,
+    distort_coeffs_,
+    predicted_center_2d
+  );
+
+  if (predicted_center_2d.empty()) {
+    return armor.points;
+  }
+
+  cv::Point2f old_center(0.0f, 0.0f);
+  for (const auto & p : armor.points) {
+    old_center += p;
+  }
+  old_center *= 0.25f;
+
+  cv::Point2f offset = predicted_center_2d[0] - old_center;
+
+  std::vector<cv::Point2f> predicted_points;
+  predicted_points.reserve(armor.points.size());
+
+  for (const auto & p : armor.points) {
+    predicted_points.emplace_back(p + offset);
+  }
+
+  return predicted_points;
+}
+
 void Aimer::reset(const Armor & armor, double timestamp)
 {
   const auto measurement = makeMeasurement(armor);

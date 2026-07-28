@@ -67,7 +67,16 @@ int main(int argc, char** argv) {
 
      if (target != nullptr) {
        auto aim = aimer.update(*target, timestamp);
-       aimer.drawReprojection(show_img, aim);
+       auto predicted_points = aimer.predictArmorPoints2D(*target, aim);
+       for (int i = 0; i < 4; ++i) {
+        cv::line(
+          show_img,
+          predicted_points[i],
+          predicted_points[(i + 1) % 4],
+          cv::Scalar(0, 255, 0),
+          2
+        );
+      }
 
        cv::putText(
          show_img,
